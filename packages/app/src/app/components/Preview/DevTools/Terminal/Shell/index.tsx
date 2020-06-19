@@ -98,9 +98,7 @@ class ShellComponent extends React.PureComponent<Props> {
   };
 
   componentWillUnmount() {
-    if (typeof this.listener === 'function') {
-      this.listener();
-    }
+    this.listener();
 
     dispatch({
       type: 'socket:message',
