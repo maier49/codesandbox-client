@@ -44,14 +44,14 @@ export const loadGitSource: AsyncAction = async ({
   actions,
   effects,
 }) => {
+  if (!state.user || !state.user.integrations.github) {
+    return;
+  }
+
   const sandbox = state.editor.currentSandbox!;
   state.git.isFetching = true;
   state.git.isExported = false;
   state.git.pr = null;
-
-  if (!state.user || !state.user.integrations.github) {
-    return;
-  }
 
   // We go grab the current version of the source
   try {
