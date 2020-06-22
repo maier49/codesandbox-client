@@ -18,11 +18,18 @@ export default {
         state.editor.isAllModulesSynced,
         state.editor.currentSandbox?.template,
         state.preferences.settings.livePreviewEnabled,
+        state.preferences.settings.instantPreviewEnabled,
       ],
-      ([isAllModulesSynced, template, livePreviewEnabled]) => {
+      ([
+        isAllModulesSynced,
+        template,
+        livePreviewEnabled,
+        instantPreviewEnabled,
+      ]) => {
         if (
           isAllModulesSynced &&
-          (template === 'static' || !livePreviewEnabled)
+          (template === 'static' ||
+            (!livePreviewEnabled && !instantPreviewEnabled))
         ) {
           preview.handleRefresh();
         }
