@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import getTemplate from '@codesandbox/common/lib/templates';
 import { generateFileFromSandbox } from '@codesandbox/common/lib/templates/configuration/package-json';
 import { getPreviewTabs } from '@codesandbox/common/lib/templates/devtools';
@@ -18,9 +20,9 @@ import {
   Tabs,
   WindowOrientation,
 } from '@codesandbox/common/lib/types';
-import { RecoverData } from 'app/overmind/effects/moduleRecover.ts';
 import { getSandboxOptions } from '@codesandbox/common/lib/url';
 import { CollaboratorFragment, InvitationFragment } from 'app/graphql/types';
+import { RecoverData } from 'app/overmind/effects/moduleRecover.ts';
 import immer from 'immer';
 import { derived } from 'overmind';
 
@@ -82,6 +84,7 @@ type State = {
   sessionFrozen: boolean;
   hasLoadedInitialModule: boolean;
   recoveredFiles: Array<{ recoverData: RecoverData; module: Module }>;
+  explorer: Array<Module | Directory>;
 };
 
 export const state: State = {
@@ -298,6 +301,39 @@ export const state: State = {
       });
     }
   ),
+  explorer: derived(({ currentSandbox }: State) => {
+    if (!currentSandbox) {
+      return [];
+    }
+
+    return currentSandbox.directories
+      .slice()
+      .sort((a, b) => {
+        if (a.path < b.path) {
+          return -1;
+        }
+        if (a.path > b.path) {
+          return 1;
+        }
+
+        return 0;
+      })
+      .reduce<(Module | Directory)[]>(
+        (aggr, directory) =>
+          aggr.concat(
+            directory,
+            currentSandbox.modules.filter(
+              module => path.dirname(module.path) === directory.path
+            )
+          ),
+        []
+      )
+      .concat(
+        currentSandbox.modules.filter(
+          module => path.dirname(module.path) === '/'
+        )
+      );
+  }),
 };
 
 // This should be moved somewhere else
