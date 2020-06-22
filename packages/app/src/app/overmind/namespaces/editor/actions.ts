@@ -312,6 +312,37 @@ export const contentMounted: Action = ({ state, effects }) => {
   });
 };
 
+export const previewModeToggled: Action = ({ state, actions }) => {
+  if (state.preferences.settings.instantPreviewEnabled) {
+    actions.preferences.settingChanged({
+      value: false,
+      name: 'instantPreviewEnabled',
+    });
+    actions.preferences.settingChanged({
+      value: false,
+      name: 'livePreviewEnabled',
+    });
+  } else if (state.preferences.settings.livePreviewEnabled) {
+    actions.preferences.settingChanged({
+      value: true,
+      name: 'instantPreviewEnabled',
+    });
+    actions.preferences.settingChanged({
+      value: false,
+      name: 'livePreviewEnabled',
+    });
+  } else {
+    actions.preferences.settingChanged({
+      value: false,
+      name: 'instantPreviewEnabled',
+    });
+    actions.preferences.settingChanged({
+      value: true,
+      name: 'livePreviewEnabled',
+    });
+  }
+};
+
 export const resizingStarted: Action = ({ state }) => {
   state.editor.isResizing = true;
 };
@@ -325,7 +356,7 @@ export const codeSaved: AsyncAction<{
   moduleShortid: string;
   cbID: string | null;
 }> = withOwnedSandbox(
-  async ({ state, actions }, { code, moduleShortid, cbID }) => {
+  async ({ actions }, { code, moduleShortid, cbID }) => {
     actions.editor.internal.saveCode({
       code,
       moduleShortid,
@@ -364,7 +395,11 @@ export const onOperationApplied: Action<{
     code,
   });
 
-  actions.editor.internal.updatePreviewCode();
+  const { isServer } = getTemplate(state.editor.currentSandbox.template);
+
+  if (!isServer && state.preferences.settings.instantPreviewEnabled) {
+    effects.preview.executeCodeImmediately();
+  }
 
   // If we are in a state of sync, we set "revertModule" to set it as saved
   if (module.savedCode !== null && module.code === module.savedCode) {
@@ -484,8 +519,8 @@ export const codeChanged: Action<{
 
   const { isServer } = getTemplate(state.editor.currentSandbox.template);
 
-  if (!isServer && state.preferences.settings.livePreviewEnabled) {
-    actions.editor.internal.updatePreviewCode();
+  if (!isServer && state.preferences.settings.instantPreviewEnabled) {
+    effects.preview.executeCodeImmediately();
   }
 
   if (state.editor.currentSandbox.originalGit) {
@@ -691,7 +726,7 @@ export const moduleSelected: AsyncAction<
       effects.live.sendUserCurrentModule(module.shortid);
 
       if (!state.editor.isInProjectView) {
-        actions.editor.internal.updatePreviewCode();
+        effects.preview.executeCodeImmediately();
       }
     }
   } catch (error) {
@@ -766,9 +801,9 @@ export const toggleStatusBar: Action = ({ state }) => {
   state.editor.statusBar = !state.editor.statusBar;
 };
 
-export const projectViewToggled: Action = ({ state, actions }) => {
+export const projectViewToggled: Action = ({ state, effects }) => {
   state.editor.isInProjectView = !state.editor.isInProjectView;
-  actions.editor.internal.updatePreviewCode();
+  effects.preview.executeCodeImmediately();
 };
 
 export const frozenUpdated: AsyncAction<{ frozen: boolean }> = async (

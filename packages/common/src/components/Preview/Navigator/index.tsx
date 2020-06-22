@@ -1,20 +1,19 @@
 import React from 'react';
-import { ModuleViewIcon } from '../../icons/ModuleView';
-import { ProjectViewIcon } from '../../icons/ProjectView';
-import { NewWindowIcon } from '../../icons/NewWindow';
+
 import { BackIcon } from '../../icons/Back';
 import { ForwardIcon } from '../../icons/Forward';
+import { ModuleViewIcon } from '../../icons/ModuleView';
+import { NewWindowIcon } from '../../icons/NewWindow';
+import { ProjectViewIcon } from '../../icons/ProjectView';
 import { ReloadIcon } from '../../icons/Reload';
-
 import Tooltip from '../../Tooltip';
-
 import AddressBar from '../AddressBar';
 import {
-  Container,
-  Icons,
-  Icon,
   AddressBarContainer,
+  Container,
+  Icon,
   IconWithBackground,
+  Icons,
 } from './elements';
 
 export interface NavigatorProps {
@@ -25,6 +24,8 @@ export interface NavigatorProps {
   toggleProjectView?: () => void;
   onBack?: () => void;
   onForward?: () => void;
+  togglePreviewMode?: () => void;
+  previewMode?: 'instantPreview' | 'livePreview' | null;
   openNewWindow?: () => void;
   zenMode?: boolean;
   isProjectView: boolean;
@@ -39,6 +40,8 @@ function Navigator({
   onRefresh,
   isProjectView,
   toggleProjectView,
+  togglePreviewMode,
+  previewMode,
   openNewWindow,
   zenMode,
 }: NavigatorProps) {
@@ -62,6 +65,32 @@ function Navigator({
       >
         <AddressBar url={url} onChange={onChange} onConfirm={onConfirm} />
       </AddressBarContainer>
+      {togglePreviewMode && (
+        <IconWithBackground
+          onClick={togglePreviewMode}
+          moduleView={!isProjectView}
+        >
+          <Tooltip
+            delay={0}
+            content={
+              previewMode === 'instantPreview'
+                ? 'Hot reload on keypress'
+                : previewMode === 'livePreview'
+                ? 'Hot reload on save'
+                : 'Refresh on save'
+            }
+            placement="left"
+          >
+            <span style={{ color: 'white' }}>
+              {previewMode === 'instantPreview'
+                ? 'Ø'
+                : previewMode === 'livePreview'
+                ? 'O'
+                : 'x'}
+            </span>
+          </Tooltip>
+        </IconWithBackground>
+      )}
       {!zenMode && toggleProjectView && (
         <IconWithBackground
           onClick={toggleProjectView}

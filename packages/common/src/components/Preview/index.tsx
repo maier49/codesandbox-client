@@ -37,6 +37,8 @@ export type Props = {
   onToggleProjectView?: () => void;
   isResizing?: boolean;
   onResize?: (height: number) => void;
+  togglePreviewMode?: () => void;
+  previewMode?: 'instantPreview' | 'livePreview' | null;
   showNavigation?: boolean;
   inactive?: boolean;
   dragging?: boolean;
@@ -586,6 +588,8 @@ class BasePreview extends React.Component<Props, State> {
             url={url}
             onChange={this.updateUrl}
             onConfirm={this.sendUrl}
+            togglePreviewMode={this.props.togglePreviewMode}
+            previewMode={this.props.previewMode}
             onBack={back ? this.handleBack : null}
             onForward={forward ? this.handleForward : null}
             onRefresh={this.handleRefresh}

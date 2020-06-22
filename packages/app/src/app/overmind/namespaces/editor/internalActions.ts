@@ -125,6 +125,18 @@ export const saveCode: AsyncAction<{
     return;
   }
 
+  const { isServer } = getTemplateDefinition(
+    state.editor.currentSandbox.template
+  );
+
+  if (
+    !isServer &&
+    (state.preferences.settings.livePreviewEnabled ||
+      state.preferences.settings.instantPreviewEnabled)
+  ) {
+    effects.preview.executeCodeImmediately();
+  }
+
   try {
     let updatedModule: {
       updatedAt: string;
@@ -579,13 +591,5 @@ export const updateDevtools: AsyncAction<{
     }
   } else {
     state.editor.workspaceConfigCode = code;
-  }
-};
-
-export const updatePreviewCode: Action = ({ state, effects }) => {
-  if (state.preferences.settings.instantPreviewEnabled) {
-    effects.preview.executeCodeImmediately();
-  } else {
-    effects.preview.executeCode();
   }
 };

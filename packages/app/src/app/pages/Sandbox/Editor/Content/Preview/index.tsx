@@ -1,9 +1,8 @@
-import { ServerContainerStatus } from '@codesandbox/common/lib/types';
 import BasePreview from '@codesandbox/common/lib/components/Preview';
 import RunOnClick from '@codesandbox/common/lib/components/RunOnClick';
-import React, { FunctionComponent, useState } from 'react';
-
+import { ServerContainerStatus } from '@codesandbox/common/lib/types';
 import { useOvermind } from 'app/overmind';
+import React, { FunctionComponent, useState } from 'react';
 
 type Props = {
   hidden?: boolean;
@@ -19,7 +18,12 @@ export const Preview: FunctionComponent<Props> = ({
 }) => {
   const {
     actions: {
-      editor: { errorsCleared, previewActionReceived, projectViewToggled },
+      editor: {
+        errorsCleared,
+        previewActionReceived,
+        projectViewToggled,
+        previewModeToggled,
+      },
     },
     effects: {
       preview: { initializePreview },
@@ -74,6 +78,14 @@ export const Preview: FunctionComponent<Props> = ({
       onToggleProjectView={() => projectViewToggled()}
       overlayMessage={getOverlayMessage()}
       previewSecret={currentSandbox.previewSecret}
+      togglePreviewMode={previewModeToggled}
+      previewMode={
+        settings.instantPreviewEnabled
+          ? 'instantPreview'
+          : settings.livePreviewEnabled
+          ? 'livePreview'
+          : null
+      }
       privacy={currentSandbox.privacy}
       sandbox={currentSandbox}
       settings={settings}
