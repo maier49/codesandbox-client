@@ -41,7 +41,8 @@ class DojoStyleTranspiler extends StyleTranspiler {
       ' _key': key,
       ...exportTokens,
     })};`;
-    dispatch({ type: 'add-extra-lib', path, code: toDefinition(exportTokens) });
+    const definition = toDefinition(exportTokens)
+    dispatch({ type: 'add-extra-lib', path, code: definition });
     return { transpiledCode: result };
   }
 }

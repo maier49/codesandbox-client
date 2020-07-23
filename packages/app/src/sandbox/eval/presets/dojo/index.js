@@ -3,6 +3,7 @@ import Preset from '..';
 
 import typescriptTranspiler from '../../transpilers/typescript';
 import rawTranspiler from '../../transpilers/raw';
+import noopTranspiler from '../../transpilers/noop';
 import jsonTranspiler from '../../transpilers/json';
 import stylesTranspiler from '../../transpilers/style';
 import dojoStylesTranspiler from './transpilers/style';
@@ -35,6 +36,10 @@ export default function initialize() {
       },
     }
   );
+
+  preset.registerTranspiler(module => /\.m\.css\.d\.ts$/.test(module.path), [
+    { transpiler: noopTranspiler }
+  ]);
 
   preset.registerTranspiler(module => /\.tsx?$/.test(module.path), [
     { transpiler: typescriptTranspiler },

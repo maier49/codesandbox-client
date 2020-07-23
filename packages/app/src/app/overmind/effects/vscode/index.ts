@@ -1258,12 +1258,15 @@ export class VSCodeEffect {
   private initializeCodeSandboxAPIListener() {
     return listen(({ action, type, code, path, lineNumber, column }: any) => {
       if (type === 'add-extra-lib') {
-        // TODO: bring this func back
-        // const dtsPath = `${path}.d.ts`;
-        // this.monaco.languages.typescript.typescriptDefaults._extraLibs[
-        //   `file:///${dtsPath}`
-        // ] = code;
-        // this.commitLibChanges();
+        const fs = BrowserFS.BFSRequire('fs');
+        const dtsPath = `sandbox${path}.d.ts`;
+        fs.writeFile(dtsPath, code, err => {
+          if (err) {
+            console.error(err)
+          } else {
+            console.log('Wrote the file');
+          }
+        });
       } else if (action === 'editor.open-module') {
         const options: {
           selection?: { startLineNumber: number; startColumn: number };
