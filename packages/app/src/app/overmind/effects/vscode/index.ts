@@ -1264,7 +1264,8 @@ export class VSCodeEffect {
           if (err) {
             console.error(err)
           } else {
-            console.log('Wrote the file');
+            console.log(`Written to file: ${code}`);
+            console.log(`Read from file ${fs.readFileSync(dtsPath).toString()}`);
           }
         });
       } else if (action === 'editor.open-module') {
